@@ -1,0 +1,54 @@
+{
+  "name": "Synapz - Daily Knowledge",
+  "short_name": "Synapz",
+  "description": "Discover interesting facts daily with gamification. Earn streaks, points, and expand your knowledge.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["education", "lifestyle", "productivity"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Synapz Daily Facts"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View Facts Feed",
+      "short_name": "Feed",
+      "description": "View today's facts",
+      "url": "/feed",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Profile",
+      "short_name": "Profile",
+      "description": "View your profile and stats",
+      "url": "/profile",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
