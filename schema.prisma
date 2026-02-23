@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  username      String   @unique
+  email         String   @unique
+  passwordHash  String
+  level         Int      @default(1)
+  totalXP       Int      @default(0)
+  badges        String   @default("[]")  // JSON array of badge IDs
+  streakCount   Int      @default(0)
+  longestStreak Int      @default(0)
+  totalPoints   Int      @default(0)
+  factsRead     Int      @default(0)
+  wikiClicks    Int      @default(0)    // Track wiki link clicks for "Wiki Explorer" badge
+  savedFactIds  String   @default("[]")  // JSON array of saved fact IDs (legacy, kept for compatibility)
+  lastLogin     DateTime?
+  lastActive    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  facts         Fact[]
+  userActivities UserActivity[]
+  savedFacts    SavedFact[]
+}
+
+model Fact {
+  id          String   @id @default(cuid())
+  title       String   @unique  // Unique constraint - no duplicate titles
+  text        String
+  textHash    String?  @unique  // Hash of text for duplicate detection at DB level
+  category    String
+  source      String?
+  imageUrl    String?
+  keywords    String?  // JSON array of {word: string, wikiSlug?: string} for manual entity overrides
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id])
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  savedFacts  SavedFact[]
+
+  @@index([createdAt(sort: Desc)])  // Index for efficient pagination sorting
+  @@index([category])               // Index for category filtering
+}
+
+model UserActivity {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  activityType String   // "login", "fact_read", "streak_earned", "fact_reviewed"
+  points       Int      @default(0)
+  metadata     String?  // JSON string for additional data
+  createdAt    DateTime @default(now())
+}
+
+// Spaced Repetition System - Saved facts with review metadata
+model SavedFact {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  factId         String
+  fact           Fact     @relation(fields: [factId], references: [id])
+  
+  // SRS Fields (Leitner System)
+  nextReviewDate DateTime @default(now())  // When to review next
+  interval       Int      @default(1)       // Days between reviews (1, 3, 7, 14, 30...)
+  easeFactor     Float    @default(2.5)     // SM-2 ease factor for flexibility
+  timesReviewed  Int      @default(0)       // Total number of reviews
+  timesRemembered Int    @default(0)        // Times user remembered
+  timesForgot    Int      @default(0)        // Times user forgot
+  
+  lastReviewedAt DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Unique constraint - user can only save a fact once
+  @@unique([userId, factId])
+  @@index([nextReviewDate])  // For querying due reviews
+}
